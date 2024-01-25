@@ -1,0 +1,4 @@
+/.idea/
+/apache-zookeeper-3.8.3/.idea/
+target/
+generated/

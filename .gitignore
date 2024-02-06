@@ -2,3 +2,6 @@
 /apache-zookeeper-3.8.3/.idea/
 target/
 generated/
+
+/apache-zookeeper-3.8.3/zkdata?/*
+!/apache-zookeeper-3.8.3/zkdata?/myid

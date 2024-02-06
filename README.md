@@ -1,5 +1,53 @@
 # Apache ZooKeeper 源码分析
 
+## Windows 源码 一台机器 三个节点
+
+1。 拷贝 zoo_sample.cfg 准备三个节点 配置
+```
+zoo1.cfg (另两个分别为zoo2 zoo3)
+
+tickTime=2000
+initLimit=10
+syncLimit=5
+
+dataDir=zkdata1 (另两个分别为zkdata2 zkdata3)
+dataLogDir=zklog1 (另两个分别为zklog2 zklog3) (这个配置调试时可以不需要，默认为dataDir的值)
+clientPort=2181 (另两个分别为2182 2183)
+
+(不用 1 2 3是为了看日志方便)
+server.101=localhost:2777:3777
+server.102=localhost:2888:3888
+server.103=localhost:2999:3999
+```
+
+2. 创建 myid
+```
+zkdata1/myid 里面 101 (不用 1 2 3是为了看日志方便)
+zkdata2/myid 里面 102
+zkdata3/myid 里面 103
+```
+3. 添加多三个 运行配置 ZooKeeper1 2 3，里面只需要修改参数为 conf/zoo1.cfg zoo2.cfg zoo3.cfg
+4. 启动 ZooKeeper1 2 3
+```
+日志简要分析
+ZooKeeper1 启动时
+    Cannot open channel to 103 at election address localhost/127.0.0.1:3999
+    Cannot open channel to 102 at election address localhost/127.0.0.1:3888
+    (不停地尝试连接102 103 的竞选地址)
+
+ZooKeeper2 启动时
+    Sending UPTODATE message to 101
+    Peer state changed: leading - broadcast (不会尝试连接103的竞选地址，已经选出leader)
+    (ZooKeeper1 Peer state changed: following - broadcast 不再尝试连接103的竞选地址)
+
+ZooKeeper 3 启动时
+    Learner received UPTODATE message
+    Peer state changed: following - broadcast
+    (ZooKeeper 102 Sending UPTODATE message to 103)
+    (ZooKeeper 101 There is a connection already for server 103)
+```
+5. 可视化工具
+
 ## 源码分析
 
 IDEA 打开 apache-zookeeper-3.8.3

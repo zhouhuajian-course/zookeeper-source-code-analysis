@@ -47,6 +47,7 @@ ZooKeeper 3 启动时
     (ZooKeeper 101 There is a connection already for server 103)
 ```
 5. 可视化工具
+6. 调试 关闭leader，毫秒级，响应，另一个follower会变成leader，原来Leader再上线，变follower，两天都挂，没超过半数，集群挂
 
 ## 源码分析
 
@@ -126,4 +127,7 @@ https://zookeeper.apache.org/
 10. 默认有个zookeeper节点
 11. 多个机器，ssh免密登录后，可以使用 case for ssh 命令结合，快速实现多台机器ZK的启动、停止和状态插叙，同样也可以实现多天机器jps快速查询
 12. idea使用单元测试，可方便快速测试
-13. 
+13. 如果客户端连leader，写数据发到leader，leader把数据发给所有follower写，follower写完会ack，超过半数写成功，则返回ack给客户端
+14. 如果客户端连follower，写数据发到follower，该follower把写数据发给leader，leader发数据发给所有follower写，folloer写成功会ack给leader，超过半数写成功，leader回ack给那个follower，那个follower再ack给client
+15. 集群每个节点，内存和磁盘都会存一份数据，因为zk的数据量一般很小，可以都存在内存，另外对数据的修改不会马上生成完整数据，而是写到编辑日志，或者叫增量日志，机器空闲时，就可以写到快照
+16. 磁盘中的数据，由快照和增量日志组成，两者结合才是完整的数据
